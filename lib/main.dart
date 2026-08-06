@@ -1,0 +1,219 @@
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
+void main() {
+  // Memformat mata uang rupiah indonesia pemisah ribuan yaitu titik 
+  final currencyFormat = NumberFormat.currency(
+    locale: 'id_ID',  // Menggunakan standar pemisah ribuan di Indonesia
+    symbol: 'Rp. ',   // Digunakan sebagi simbol mata uang dan ditampilkan sebelum angka
+    decimalDigits: 2, // Digunakan untuk menampilkan angka desimal
+  );
+
+  // LOGIKA DATA BARANG & PERHITUNGAN TRANSAKSI
+  String kategori = "makanan";
+  String namaBarang;
+  String lokasiRak;
+
+  switch (kategori.toLowerCase()) {
+  case "atk":
+    namaBarang = "Buku Tulis";
+    lokasiRak = "Rak 1";
+    break;
+
+  case "makanan":
+    namaBarang = "Roti";
+    lokasiRak = "Rak 2";
+    break;
+
+  case "minuman":
+    namaBarang = "Es Teh";
+    lokasiRak = "Rak 3";
+    break;
+  default:
+    namaBarang = "Barang Umum";
+    lokasiRak = "Rak Lain";
+  }
+  // Switch disini lebih rapi daripada if-else karena memang hanya
+  // dikhususkan untuk memerikasa nilai pasti. Misal disini saya ingin menampilkan
+  // minuman, maka program akan langsung pergi ke case yang sesuai tanpa perlu cek
+  // satu persatu seperti saat menggunakan if-else.  
+
+  double hargaAnggota = 10000.00;
+  double hargaUmum = 10500.00;
+
+  int stok = 3;
+  // Transaksi Pembelian
+  int jumlahBeli = 4 ;
+  bool isTersedia = stok > 0;
+  if(jumlahBeli <= 0){
+    debugPrint("Jumlah Pembelian Tidak Boleh Kurang Dari 0!");
+    return;
+  }
+  if(jumlahBeli > stok ){
+    debugPrint("Stok Tidak Cukup! Jumlah Pembelian : $jumlahBeli, Stok : $stok");
+    return;
+  }
+
+  debugPrint('====Informasi stok penjualan====');
+  while (stok >= jumlahBeli){
+    stok--;
+    debugPrint('Terjual 1, sisa stok : $stok');
+  }
+
+  // Bila kondisi berhenti pada while keliru bisa menyebabkan
+  // perulangan yang tak berhenti. Solusinya adalah mengatur 
+  // kembali kondisi perulangan while menjadi jika stok
+  // lebih dari sama dengan jumlah beli, maka perulangan
+  // bisa dilakukan. Namun jika jika jumlah beli yang lebih
+  // banyak maka perulangan tida akan dilakukan.
+
+  double hargaSatuan ;
+
+  bool isAnggota = true ; //Bisa diganti false untuk hargaUmum
+  if (isAnggota) {
+    hargaSatuan = hargaAnggota;
+  } else {
+    hargaSatuan = hargaUmum;
+  }
+
+  // Perhitungan
+  double totalAwal = jumlahBeli * hargaSatuan;
+
+  double persentaseDiskon = 0.0;
+  if (isAnggota && totalAwal > 500000){
+    persentaseDiskon = 0.15;
+  } else if (totalAwal > 200000) {
+    persentaseDiskon = 0.10;
+  } else if (totalAwal > 100000) {
+    persentaseDiskon = 0.05;
+  } else {
+    persentaseDiskon = 0.0;   
+  }
+
+  double nilaiPotongan = totalAwal * persentaseDiskon;
+  double hargaAkhir = totalAwal - nilaiPotongan;
+
+  List <String> daftarBarang = [
+    'Buku Tulis',
+    'Pensil',
+    'Roti',
+    'Es Teh'
+  ] ;
+  List <double> daftarHarga = [
+    3000.00,
+    2500.00,
+    5000.00,
+    6000.00
+  ] ;
+
+  debugPrint('========Informasi Barang========');
+  for (int i = 0; i < daftarBarang.length; i++){
+    String nama = daftarBarang[i];
+    String hargaFormatted = currencyFormat.format(daftarHarga[i]);
+    
+    debugPrint("${i + 1}. $nama - $hargaFormatted");
+  }
+
+  if (jumlahBeli <= 0 || totalAwal <= 0) {
+  // Muncul ketika input yang dimasukkan salah
+  debugPrint("TRANSAKSI TIDAK VALID!");
+  debugPrint("Jumlah beli atau total tidak boleh 0 atau negatif.");
+  } else {  
+  debugPrint("Memproses Transaksi");
+  // Cetak ke Debug Console
+  debugPrint("======= KARTU DATA BARANG =======");
+
+  // Status pembeli berubah tergantung nilai variabel bool isAnggota
+  debugPrint("Status Pembeli  : ${isAnggota ? 'Anggota' : 'Umum'}");
+  debugPrint("Nama Barang     : $namaBarang");
+
+  // Menampilkan kategori dan lokasi rak
+  debugPrint("Kategori        : ${kategori.toUpperCase()}");
+  debugPrint("Lokasi Rak      : $lokasiRak");
+
+  // Menampilkan harga satuan menurut status pembeli
+  debugPrint("Harga Satuan    : ${currencyFormat.format(hargaSatuan)}");
+  debugPrint("Stok            : $stok");
+
+  // Status ditampilkan menurut logika boolean yang berasal dari stok
+  // Yang ditampilkan antara lain Tersedia atau Habis
+  debugPrint("Status          : ${isTersedia ? 'Tersedia' : 'Habis'}");
+
+  debugPrint("Jumlah Beli     : $jumlahBeli");
+  debugPrint("Total Awal      : ${currencyFormat.format(totalAwal)}");
+  debugPrint("Potongan Diskon : ${currencyFormat.format(nilaiPotongan)} (${(persentaseDiskon * 100).toInt()}%)");
+  
+  debugPrint("HARGA AKHIR     : ${currencyFormat.format(hargaAkhir)}");
+  debugPrint("==================================");
+  }
+  // Jalankan Aplikasi
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
+      ),
+      home: const MyHomePage(title: 'Test Penghitung'),
+    );
+  }
+}
+
+class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key, required this.title});
+
+  final String title;
+
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  int _counter = 0;
+
+  void _incrementCounter() {
+    setState(() {
+      _counter++;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: Text(widget.title),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text('You have pushed the button this many times:'),
+            Text(
+              '$_counter',
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _incrementCounter,
+        tooltip: 'Increment',
+        child: const Icon(Icons.add),
+      ),
+    );
+  }
+}
+
+//Pemilihan tipe data yang tepat sangat penting untuk keakuratan kasir koperasi
+//agar tidak terjadi kesalahan perhitungan uang atau stok barang.
+//Tipe data `double` memastikan perhitungan harga pecahan/desimal seperti
+//total dan selisih tetap akurat hingga nilai sen.
+//Sementara itu, `int` menjaga jumlah stok dan unit pembelian tetap berupa
+//bilangan bulat yang valid tanpa pecahan.
