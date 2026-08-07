@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+double hitungTotal(int jumlah, double harga){
+  return jumlah * harga;
+}
+double hitungHargaAkhir(double total, double persenPotongan){
+  return total - (total * persenPotongan / 100);
+}
 void main() {
   // Memformat mata uang rupiah indonesia pemisah ribuan yaitu titik 
   final currencyFormat = NumberFormat.currency(
@@ -43,7 +49,7 @@ void main() {
 
   int stok = 3;
   // Transaksi Pembelian
-  int jumlahBeli = 4 ;
+  int jumlahBeli = 1 ;
   bool isTersedia = stok > 0;
   if(jumlahBeli <= 0){
     debugPrint("Jumlah Pembelian Tidak Boleh Kurang Dari 0!");
@@ -64,8 +70,8 @@ void main() {
   // perulangan yang tak berhenti. Solusinya adalah mengatur 
   // kembali kondisi perulangan while menjadi jika stok
   // lebih dari sama dengan jumlah beli, maka perulangan
-  // bisa dilakukan. Namun jika jika jumlah beli yang lebih
-  // banyak maka perulangan tida akan dilakukan.
+  // bisa dilakukan. Namun jika jumlah beli yang lebih
+  // banyak maka perulangan tidak akan dilakukan.
 
   double hargaSatuan ;
 
@@ -90,8 +96,8 @@ void main() {
     persentaseDiskon = 0.0;   
   }
 
-  double nilaiPotongan = totalAwal * persentaseDiskon;
-  double hargaAkhir = totalAwal - nilaiPotongan;
+  double hargaAkhir = hitungHargaAkhir(totalAwal, persentaseDiskon);
+  double nilaiPotongan = totalAwal - hargaAkhir;
 
   List <String> daftarBarang = [
     'Buku Tulis',
@@ -105,14 +111,57 @@ void main() {
     5000.00,
     6000.00
   ] ;
+  List<int> daftarStok = [
+    10, 
+    15, 
+    3, 
+    2
+  ] ;
+  debugPrint('========Laporan Stok Menipis========');
+  for (int i = 0; i < daftarBarang.length; i++) {
+    if (daftarStok[i] < 5) {
+      String nama = daftarBarang[i];
+      int stokBarang = daftarStok[i];
+      String hargaFormatted = currencyFormat.format(daftarHarga[i]);
 
+      debugPrint("Stok Hampir Habis, Nama : $nama | Sisa Stok : $stokBarang | Harga : $hargaFormatted");
+    }
+  }
+  double totalNilaiStok = 0.0;
   debugPrint('========Informasi Barang========');
   for (int i = 0; i < daftarBarang.length; i++){
     String nama = daftarBarang[i];
-    String hargaFormatted = currencyFormat.format(daftarHarga[i]);
+    double harga = daftarHarga[i];
+    int stokBarang = daftarStok[i];
+
+    // Hitung total nilai stok per jenis barang
+    double subtotalStok = harga * stokBarang;
+
+    // Menambahkan nilai ke total keseluruhan
+    totalNilaiStok += subtotalStok;
+
+    String hargaFormatted = currencyFormat.format(harga);
+    String subtotalFormatted = currencyFormat.format(subtotalStok);
     
-    debugPrint("${i + 1}. $nama - $hargaFormatted");
+    debugPrint("${i + 1}. $nama - $hargaFormatted | Stok: $stokBarang (Total: $subtotalFormatted)",);
   }
+  debugPrint("=========================================");
+  debugPrint(
+    "Total Nilai Seluruh Stok : ${currencyFormat.format(totalNilaiStok)}",
+  );
+  debugPrint("=========================================");
+
+  double totalTranskasi = hitungTotal(jumlahBeli, hargaSatuan);
+  debugPrint('Jumlah Beli : $jumlahBeli');
+  debugPrint('Harga       : $hargaSatuan');
+  debugPrint('Total Harga : ${currencyFormat.format(totalTranskasi)}');
+  debugPrint('=========================================');
+
+  debugPrint("=== Harga AKhir ===");
+  debugPrint("Total Awal         : ${currencyFormat.format(totalAwal)}");
+  debugPrint("Potongan           : ${persentaseDiskon.toInt()}% (${currencyFormat.format(nilaiPotongan)})");
+  debugPrint("Harga akhir        : ${currencyFormat.format(hargaAkhir)}");
+
 
   if (jumlahBeli <= 0 || totalAwal <= 0) {
   // Muncul ketika input yang dimasukkan salah
@@ -141,7 +190,7 @@ void main() {
 
   debugPrint("Jumlah Beli     : $jumlahBeli");
   debugPrint("Total Awal      : ${currencyFormat.format(totalAwal)}");
-  debugPrint("Potongan Diskon : ${currencyFormat.format(nilaiPotongan)} (${(persentaseDiskon * 100).toInt()}%)");
+  debugPrint("Potongan Diskon : ${currencyFormat.format(nilaiPotongan)} (${persentaseDiskon.toInt()}%)");
   
   debugPrint("HARGA AKHIR     : ${currencyFormat.format(hargaAkhir)}");
   debugPrint("==================================");
