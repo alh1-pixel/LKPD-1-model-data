@@ -7,6 +7,43 @@ double hitungTotal(int jumlah, double harga){
 double hitungHargaAkhir(double total, double persenPotongan){
   return total - (total * persenPotongan / 100);
 }
+double hitungHarga(bool anggota, double hAnggota, double hUmum) {
+  return anggota ? hAnggota : hUmum;
+}
+// Logika lebih terpusat disatu tempat, jika nanti perlu pembaruan kode
+// cukup bagian ini saja yamg diganti dan juga mencegah kesalahan kode yang ditulis
+// berulang seperti percabangan if-else.
+double bayarAkhir(int jumlah, double harga, double persenPotongan){
+  double totalAwal = hitungTotal(jumlah, harga);
+  return hitungHargaAkhir(totalAwal, persenPotongan);
+}
+class Barang {
+  // Atribut
+  String nama;
+  double harga;
+  int stok;
+  // Konstruktor
+  Barang({
+    required this.nama,
+    required this.harga,
+    required this.stok,
+  });
+  // Method 1
+  double hitungTotalNilaiStok(){
+    return harga * stok;
+  }
+  // Method 2
+  bool isStokMenipis(){
+    return stok < 5;
+  }
+  // Method 3
+  void tampilkan(){
+    debugPrint('=====Kartu Data Barang=====');
+    debugPrint('Nama  : $nama');
+    debugPrint('Harga : $harga');
+    debugPrint('Stok  : $stok');
+  }
+}
 void main() {
   // Memformat mata uang rupiah indonesia pemisah ribuan yaitu titik 
   final currencyFormat = NumberFormat.currency(
@@ -50,7 +87,7 @@ void main() {
   int stok = 3;
   // Transaksi Pembelian
   int jumlahBeli = 1 ;
-  bool isTersedia = stok > 0;
+  
   if(jumlahBeli <= 0){
     debugPrint("Jumlah Pembelian Tidak Boleh Kurang Dari 0!");
     return;
@@ -65,6 +102,7 @@ void main() {
     stok--;
     debugPrint('Terjual 1, sisa stok : $stok');
   }
+  bool isTersedia = stok > 0;
 
   // Bila kondisi berhenti pada while keliru bisa menyebabkan
   // perulangan yang tak berhenti. Solusinya adalah mengatur 
@@ -73,83 +111,96 @@ void main() {
   // bisa dilakukan. Namun jika jumlah beli yang lebih
   // banyak maka perulangan tidak akan dilakukan.
 
-  double hargaSatuan ;
-
   bool isAnggota = true ; //Bisa diganti false untuk hargaUmum
-  if (isAnggota) {
-    hargaSatuan = hargaAnggota;
-  } else {
-    hargaSatuan = hargaUmum;
-  }
+  double hargaSatuan = hitungHarga(isAnggota, hargaAnggota, hargaUmum);
+  //if (isAnggota) {
+  //  hargaSatuan = hargaAnggota;
+  //} else {
+  //  hargaSatuan = hargaUmum;
+  //}
 
   // Perhitungan
-  double totalAwal = jumlahBeli * hargaSatuan;
+  double totalAwal = hitungTotal(jumlahBeli, hargaSatuan);
 
   double persentaseDiskon = 0.0;
   if (isAnggota && totalAwal > 500000){
-    persentaseDiskon = 0.15;
+    persentaseDiskon = 15.0;
   } else if (totalAwal > 200000) {
-    persentaseDiskon = 0.10;
+    persentaseDiskon = 10.0;
   } else if (totalAwal > 100000) {
-    persentaseDiskon = 0.05;
+    persentaseDiskon = 5.0;
   } else {
     persentaseDiskon = 0.0;   
   }
 
   double hargaAkhir = hitungHargaAkhir(totalAwal, persentaseDiskon);
   double nilaiPotongan = totalAwal - hargaAkhir;
-
-  List <String> daftarBarang = [
-    'Buku Tulis',
-    'Pensil',
-    'Roti',
-    'Es Teh'
-  ] ;
-  List <double> daftarHarga = [
-    3000.00,
-    2500.00,
-    5000.00,
-    6000.00
-  ] ;
-  List<int> daftarStok = [
-    10, 
-    15, 
-    3, 
-    2
-  ] ;
+  List <Barang> daftarBarang = [
+    Barang(nama: 'Buku Tulis', harga: 3000.0, stok: 10),
+    Barang(nama: 'Pensil', harga: 2500.0, stok: 15),
+    Barang(nama: 'Roti', harga: 5000.0, stok: 3),
+    Barang(nama: 'Es Teh', harga: 6000.0, stok: 2),
+  ];
+  // Memanggil method tampilkan dan memangambil data barang di list daftar barang
+  for (var barang in daftarBarang) {
+    barang.tampilkan();
+  }
   debugPrint('========Laporan Stok Menipis========');
-  for (int i = 0; i < daftarBarang.length; i++) {
-    if (daftarStok[i] < 5) {
-      String nama = daftarBarang[i];
-      int stokBarang = daftarStok[i];
-      String hargaFormatted = currencyFormat.format(daftarHarga[i]);
-
-      debugPrint("Stok Hampir Habis, Nama : $nama | Sisa Stok : $stokBarang | Harga : $hargaFormatted");
+  for(var barang in daftarBarang){
+    if(barang.isStokMenipis()){
+      String hargaFormatted = currencyFormat.format(barang.harga);
+    
+    debugPrint('Stok hampir habis, Nama : ${barang.nama} | Sisa stok : ${barang.stok} | Harga : $hargaFormatted');
     }
   }
+  debugPrint('=========================================');
   double totalNilaiStok = 0.0;
-  debugPrint('========Informasi Barang========');
-  for (int i = 0; i < daftarBarang.length; i++){
-    String nama = daftarBarang[i];
-    double harga = daftarHarga[i];
-    int stokBarang = daftarStok[i];
+  for(int i = 0; i < daftarBarang.length; i++){
+    var barang = daftarBarang[i];
 
-    // Hitung total nilai stok per jenis barang
-    double subtotalStok = harga * stokBarang;
-
-    // Menambahkan nilai ke total keseluruhan
+    double subtotalStok = barang.hitungTotalNilaiStok();
     totalNilaiStok += subtotalStok;
 
-    String hargaFormatted = currencyFormat.format(harga);
+    String hargaFormatted = currencyFormat.format(barang.harga);
     String subtotalFormatted = currencyFormat.format(subtotalStok);
-    
-    debugPrint("${i + 1}. $nama - $hargaFormatted | Stok: $stokBarang (Total: $subtotalFormatted)",);
+
+    debugPrint("${i+1}. ${barang.nama} - $hargaFormatted Stok : ${barang.stok} (Total : $subtotalFormatted)" );
   }
   debugPrint("=========================================");
-  debugPrint(
-    "Total Nilai Seluruh Stok : ${currencyFormat.format(totalNilaiStok)}",
-  );
+  debugPrint("Total Nilai Seluruh Stok : ${currencyFormat.format(totalNilaiStok)}");
   debugPrint("=========================================");
+  //for (int i = 0; i < daftarBarang.length; i++) {
+  //  if (daftarStok[i] < 5) {
+  //    String nama = daftarBarang[i];
+  //    int stokBarang = daftarStok[i];
+  //    String hargaFormatted = currencyFormat.format(daftarHarga[i]);
+  //
+  //  debugPrint("Stok Hampir Habis, Nama : $nama | Sisa Stok : $stokBarang | Harga : $hargaFormatted");
+  //}
+  //}
+  //double totalNilaiStok = 0.0;
+  //debugPrint('========Informasi Barang========');
+  //for (int i = 0; i < daftarBarang.length; i++){
+  //  String nama = daftarBarang[i];
+  //  double harga = daftarHarga[i];
+  //  int stokBarang = daftarStok[i];
+
+    // Hitung total nilai stok per jenis barang
+  //  double subtotalStok = harga * stokBarang;
+
+    // Menambahkan nilai ke total keseluruhan
+  //  totalNilaiStok += subtotalStok;
+
+  //  String hargaFormatted = currencyFormat.format(harga);
+  //  String subtotalFormatted = currencyFormat.format(subtotalStok);
+    
+  //  debugPrint("${i + 1}. $nama - $hargaFormatted | Stok: $stokBarang (Total: $subtotalFormatted)",);
+  //}
+  //debugPrint("=========================================");
+  //debugPrint(
+  //  "Total Nilai Seluruh Stok : ${currencyFormat.format(totalNilaiStok)}",
+  //);
+  //debugPrint("=========================================");
 
   double totalTranskasi = hitungTotal(jumlahBeli, hargaSatuan);
   debugPrint('Jumlah Beli : $jumlahBeli');
@@ -161,6 +212,9 @@ void main() {
   debugPrint("Total Awal         : ${currencyFormat.format(totalAwal)}");
   debugPrint("Potongan           : ${persentaseDiskon.toInt()}% (${currencyFormat.format(nilaiPotongan)})");
   debugPrint("Harga akhir        : ${currencyFormat.format(hargaAkhir)}");
+
+  double totalPembayaran = bayarAkhir(jumlahBeli, hargaSatuan, persentaseDiskon);
+  debugPrint("Total Pembayaran   : ${currencyFormat.format(totalPembayaran)}");
 
 
   if (jumlahBeli <= 0 || totalAwal <= 0) {
