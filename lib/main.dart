@@ -324,3 +324,9 @@ class _MyHomePageState extends State<MyHomePage> {
 //total dan selisih tetap akurat hingga nilai sen.
 //Sementara itu, `int` menjaga jumlah stok dan unit pembelian tetap berupa
 //bilangan bulat yang valid tanpa pecahan.
+
+// Keuntungan memodelkan barang sebagai objek bagi pengembangan sistem koperasi ke depan?
+// Jika nantinya perlu menambahkan atribut baru, cukup ditambahkan di dalam  Class Barang
+// tanpa perlu mengubah perulangan yang telah dibuat sebelumnya. Mencegah data tertukar,
+// apablia kita menggunakan list terpisah maka akan rawan terjadinya data yang tertukar antar
+// list satu dan yang lainnya.
