@@ -37,6 +37,10 @@ class Barang {
     return stok < 5;
   }
   // Method 3
+  bool bisaDijual(int diminta){
+    return stok >= diminta;
+  }
+  // Method 4
   void tampilkan(){
     debugPrint('=====Kartu Data Barang=====');
     debugPrint('Nama  : $nama');
@@ -149,6 +153,12 @@ void main() {
   // rentan tertukar dengan indeks yang lainnya apabila salah satu list mengalami perubahan.
   // Misal nanti ingin menambahkan atribut baru sepert kategori, maka hanya perlu
   // menambahkan di class 'Barang' tanpa merusak struktur list yang sudah ada. 
+  int cobaBeli = 2;
+  if (daftarBarang[2].bisaDijual(cobaBeli)){
+    debugPrint('Transaksi berhasil! Memproses penjualan ${daftarBarang[2].nama}');
+  } else {
+    debugPrint('Transaksi gagal! Stok ${daftarBarang[2].nama} tidak cukup(sisa stok : ${daftarBarang[2].stok})');
+  }
   debugPrint('========Laporan Stok Menipis========');
   for(var barang in daftarBarang){
     if(barang.isStokMenipis()){
