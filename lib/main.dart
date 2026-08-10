@@ -145,6 +145,10 @@ void main() {
   for (var barang in daftarBarang) {
     barang.tampilkan();
   }
+  // Jika dibandingkan dengan sprint 3 yang menggunakan list terpisah, data menjadi 
+  // rentan tertukar dengan indeks yang lainnya apabila salah satu list mengalami perubahan.
+  // Misal nanti ingin menambahkan atribut baru sepert kategori, maka hanya perlu
+  // menambahkan di class 'Barang' tanpa merusak struktur list yang sudah ada. 
   debugPrint('========Laporan Stok Menipis========');
   for(var barang in daftarBarang){
     if(barang.isStokMenipis()){
