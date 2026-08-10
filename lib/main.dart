@@ -28,24 +28,40 @@ class Barang {
     required this.harga,
     required this.stok,
   });
-  // Method 1
+  // Method
   double nilaiStok(){
     return harga * stok;
   }
-  // Method 2
+  // Method
   bool isStokMenipis(){
     return stok < 5;
   }
-  // Method 3
+  // Method
   bool bisaDijual(int diminta){
     return stok >= diminta;
   }
-  // Method 4
+  // Method
   void tampilkan(){
     debugPrint('=====Kartu Data Barang=====');
     debugPrint('Nama  : $nama');
     debugPrint('Harga : $harga');
     debugPrint('Stok  : $stok');
+  }
+}
+class Pembeli {
+  // Atribut
+  String nama;
+  bool isAnggota;
+  // Konstruktor
+  Pembeli ({
+    required this.nama,
+    required this.isAnggota,
+  });
+  // Method
+  void dataPembeli() {
+    debugPrint('=====Kartu Pembeli=====');
+    debugPrint('Nama   : $nama');
+    debugPrint("Status : ${isAnggota ? 'Anggota' : 'Umum'}");
   }
 }
 void main() {
@@ -136,6 +152,13 @@ void main() {
   } else {
     persentaseDiskon = 0.0;   
   }
+
+  Pembeli pembeli1 = Pembeli(
+    nama: "Rudi",
+    isAnggota: true,
+  );
+
+  pembeli1.dataPembeli();
 
   double hargaAkhir = hitungHargaAkhir(totalAwal, persentaseDiskon);
   double nilaiPotongan = totalAwal - hargaAkhir;
