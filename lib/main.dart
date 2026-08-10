@@ -29,7 +29,7 @@ class Barang {
     required this.stok,
   });
   // Method 1
-  double hitungTotalNilaiStok(){
+  double nilaiStok(){
     return harga * stok;
   }
   // Method 2
@@ -162,7 +162,7 @@ void main() {
   for(int i = 0; i < daftarBarang.length; i++){
     var barang = daftarBarang[i];
 
-    double subtotalStok = barang.hitungTotalNilaiStok();
+    double subtotalStok = barang.nilaiStok();
     totalNilaiStok += subtotalStok;
 
     String hargaFormatted = currencyFormat.format(barang.harga);
