@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+// Memformat mata uang rupiah indonesia pemisah ribuan yaitu titik 
+final currencyFormat = NumberFormat.currency(
+  locale: 'id_ID',  // Menggunakan standar pemisah ribuan di Indonesia
+  symbol: 'Rp. ',   // Digunakan sebagi simbol mata uang dan ditampilkan sebelum angka
+  decimalDigits: 2, // Digunakan untuk menampilkan angka desimal
+);
 double hitungTotal(int jumlah, double harga){
   return jumlah * harga;
 }
@@ -21,13 +27,28 @@ class Barang {
   // Atribut
   String nama;
   double harga;
-  int stok;
+  int _stok;
   // Konstruktor
   Barang({
     required this.nama,
     required this.harga,
-    required this.stok,
-  });
+    required this._stok,
+  }) ;
+  int get stok => _stok;
+  bool jual(int beli) {
+    if (beli <= 0){
+      debugPrint('Jumlah Pembelian harus lebih dari 0');
+      return false;
+    }
+    if (_stok >= beli){
+      _stok -= beli;
+      debugPrint("$beli $nama terjual. Sisa stok: $_stok");
+      return true;
+    } else {
+      debugPrint("Stok $nama tidak mencukupi (Diminta: $beli, Tersedia: $_stok).");
+      return false;
+    }
+  }
   // Method
   double nilaiStok(){
     return harga * stok;
@@ -44,7 +65,7 @@ class Barang {
   void tampilkan(){
     debugPrint('=====Kartu Data Barang=====');
     debugPrint('Nama  : $nama');
-    debugPrint('Harga : $harga');
+    debugPrint('Harga : ${currencyFormat.format(harga)}');
     debugPrint('Stok  : $stok');
   }
 }
@@ -64,14 +85,32 @@ class Pembeli {
     debugPrint("Status : ${isAnggota ? 'Anggota' : 'Umum'}");
   }
 }
+class BarangPromo extends Barang{
+  // Atribut
+  double diskon;
+  // Konstruktor
+  BarangPromo({
+    required super.nama,
+    required super.harga,
+    required super.stok,
+    required this.diskon,
+  });
+  // Method
+  double hargaPromo(){
+    return harga - (harga * diskon / 100);
+  }
+  // Method
+  void infoPromo() {
+    debugPrint("=====Info Promo=====");
+    debugPrint("Nama         : $nama");
+    debugPrint("Harga Asli   : ${currencyFormat.format(harga)}");
+    debugPrint("Diskon       : ${diskon.toInt()}%");
+    debugPrint("Harga Promo  : ${currencyFormat.format(hargaPromo())}");
+    debugPrint("Stok tersisa : $stok");
+    debugPrint("=====================");
+  }
+}
 void main() {
-  // Memformat mata uang rupiah indonesia pemisah ribuan yaitu titik 
-  final currencyFormat = NumberFormat.currency(
-    locale: 'id_ID',  // Menggunakan standar pemisah ribuan di Indonesia
-    symbol: 'Rp. ',   // Digunakan sebagi simbol mata uang dan ditampilkan sebelum angka
-    decimalDigits: 2, // Digunakan untuk menampilkan angka desimal
-  );
-
   // LOGIKA DATA BARANG & PERHITUNGAN TRANSAKSI
   String kategori = "makanan";
   String namaBarang;
@@ -167,11 +206,29 @@ void main() {
     Barang(nama: 'Pensil', harga: 2500.0, stok: 15),
     Barang(nama: 'Roti', harga: 5000.0, stok: 3),
     Barang(nama: 'Es Teh', harga: 6000.0, stok: 2),
+    BarangPromo(nama: 'Pulpen', harga: 5000.0, stok: 10, diskon: 5.0),
   ];
-  // Memanggil method tampilkan dan memangambil data barang di list daftar barang
+  // Menampilkan semua barang
   for (var barang in daftarBarang) {
-    barang.tampilkan();
+    // Cek apakah item tersebut merupakan objek BarangPromo
+    if (barang is BarangPromo) {
+      // Dart otomatis mengenali 'barang' sebagai BarangPromo di dalam blok if ini
+      barang.infoPromo();
+    } else {
+      // Jika barang biasa, panggil method tampilkan() biasa
+      barang.tampilkan();
+    }
   }
+  debugPrint("========Proses Pembelian========");
+  int kuBeli = 1; // Mencoba membeli 5 unit untuk setiap barang
+  for (var barang in daftarBarang) {
+    debugPrint("--- Memproses: ${barang.nama} (Stok Ada: ${barang.stok}) ---");
+    barang.jual(kuBeli);
+  }
+  // Memanggil method tampilkan dan memangambil data barang di list daftar barang
+  //for (var barang in daftarBarang) {
+  //  barang.tampilkan();
+  //}
   // Jika dibandingkan dengan sprint 3 yang menggunakan list terpisah, data menjadi 
   // rentan tertukar dengan indeks yang lainnya apabila salah satu list mengalami perubahan.
   // Misal nanti ingin menambahkan atribut baru sepert kategori, maka hanya perlu
