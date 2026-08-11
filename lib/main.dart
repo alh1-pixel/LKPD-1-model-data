@@ -28,6 +28,14 @@ class Barang {
   String nama;
   double harga;
   int _stok;
+  // Mencegah manipulasi perubahan stok oleh pihak luar yang nantinya bisa 
+  // menyebabkan kerugian bagi pihak koperasi. Jika perubahan stok dilakukan 
+  // secara sembarangan dengan tidak melibatkan proses transaksi, maka akan 
+  // berdampak pada laporan keuangan yang membuat nilai laporan keuangan tidak
+  // sama dengan nilai stok yang telah diubah. Dengan adanya getter akan 
+  // melindungi data stok bila ada pihak luar yang mencoba menggantinya, namun
+  // pihak luar tetap bisa melihat nilai stok yang tersisa tanpa memiliki akses 
+  // untuk mengubahnya.
   // Konstruktor
   Barang({
     required this.nama,
@@ -100,14 +108,46 @@ class BarangPromo extends Barang{
     return harga - (harga * diskon / 100);
   }
   // Method
-  void infoPromo() {
-    debugPrint("=====Info Promo=====");
+  @override
+  void tampilkan() {
+    debugPrint("=====Kartu Data Barang [Promo]=====");
     debugPrint("Nama         : $nama");
     debugPrint("Harga Asli   : ${currencyFormat.format(harga)}");
     debugPrint("Diskon       : ${diskon.toInt()}%");
     debugPrint("Harga Promo  : ${currencyFormat.format(hargaPromo())}");
     debugPrint("Stok tersisa : $stok");
-    debugPrint("=====================");
+    debugPrint("===================================");
+  }
+}
+class BarangGrosir extends Barang{
+  // Atribut
+  int minBeliGrosir;
+  double hargaGrosir;
+  // Konstruktor
+  BarangGrosir({
+    required super.nama,
+    required super.harga,
+    required super.stok,
+    required this.minBeliGrosir,
+    required this.hargaGrosir,
+  });
+  // Method
+  double hitungTotalGrosir(int jumlah){
+    if (jumlah > minBeliGrosir){
+      return jumlah * hargaGrosir;
+    } else {
+      return jumlah * harga;
+    }
+  }
+  // Method
+  @override
+  void tampilkan() {
+    debugPrint("=====Kartu Data Barang [Grosir]=====");
+    debugPrint("Nama         : $nama");
+    debugPrint("Harga Asli   : ${currencyFormat.format(harga)}");
+    debugPrint("Harga Grosir : ${currencyFormat.format(hargaGrosir)} (Min. beli $minBeliGrosir)");
+    debugPrint("Stok tersisa : $stok");
+    debugPrint("===================================");
   }
 }
 void main() {
@@ -207,18 +247,22 @@ void main() {
     Barang(nama: 'Roti', harga: 5000.0, stok: 3),
     Barang(nama: 'Es Teh', harga: 6000.0, stok: 2),
     BarangPromo(nama: 'Pulpen', harga: 5000.0, stok: 10, diskon: 5.0),
+    BarangGrosir(nama: 'Penggaris', harga: 10000.0, stok: 12, minBeliGrosir: 3, hargaGrosir: 6500.0)
   ];
   // Menampilkan semua barang
   for (var barang in daftarBarang) {
-    // Cek apakah item tersebut merupakan objek BarangPromo
-    if (barang is BarangPromo) {
-      // Dart otomatis mengenali 'barang' sebagai BarangPromo di dalam blok if ini
-      barang.infoPromo();
-    } else {
-      // Jika barang biasa, panggil method tampilkan() biasa
-      barang.tampilkan();
-    }
+    barang.tampilkan(); // Otomatis menyesuaikan bentuk tampilan barangnya!
   }
+  //for (var barang in daftarBarang) {
+    // Cek apakah item tersebut merupakan objek BarangPromo
+  //  if (barang is BarangPromo) {
+      // Dart otomatis mengenali 'barang' sebagai BarangPromo di dalam blok if ini
+  //    barang.infoPromo();
+  //  } else {
+      // Jika barang biasa, panggil method tampilkan() biasa
+  //    barang.tampilkan();
+  //  }
+  //}
   debugPrint("========Proses Pembelian========");
   int kuBeli = 1; // Mencoba membeli 5 unit untuk setiap barang
   for (var barang in daftarBarang) {
